@@ -11,7 +11,7 @@ $consulta = $db->query("SELECT token FROM users WHERE id_ufrj = '$usuario' ");
 $app_token = ($consulta->rowCount())? $consulta->fetchColumn() : NULL;
 if ($_POST['token'] && $_SESSION['token'] == $_POST['token']) {
   if (!isset($app_token)) {
-      $resposta = json_decode(file_get_contents("http://caronae.tic.ufrj.br/user/signup/intranet/$usuario/$token"),true );
+      $resposta = json_decode(file_get_contents(API_URL."/user/signup/intranet/$usuario/$token"),true );
       header('Location: /token'. (!$resposta || $resposta['erro'] ? '?erro' : '/'));
       exit;
   }
