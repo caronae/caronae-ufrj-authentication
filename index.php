@@ -17,6 +17,9 @@ if ($_POST['token'] && $_SESSION['token'] == $_POST['token']) {
   } else {
       $_POST['cmd'] == 'Gerar' or $token = '';
       $erro = $db->exec("UPDATE users SET token = '$token' WHERE id_ufrj = '$usuario'") ? '' : 'Ocorreu um problema, tente novamente!';
+      if (!$erro) {
+         header('Location: /chave');
+      }
   }
 }
 $_SESSION['token'] = $token;
