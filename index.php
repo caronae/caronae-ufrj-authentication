@@ -9,15 +9,15 @@ $token = strtoupper(substr(base_convert(sha1(uniqid() . rand()), 16, 36), 0, 6))
 $db = new PDO('pgsql:dbname=caronae;host='.DB_HOST.';', DB_USER, DB_PASSWORD);
 $consulta = $db->query("SELECT token FROM users WHERE id_ufrj = '$usuario' ");
 $app_token = ($consulta->rowCount())? $consulta->fetchColumn() : NULL;
+$erro = '';
 if ($_POST['token'] && $_SESSION['token'] == $_POST['token']) {
   if (!isset($app_token)) {
-      $resposta = json_decode(file_get_contents(API_URL."/user/signup/intranet/$usuario/$token"),true );
-      header('Location: /token'. (!$resposta || $resposta['erro'] ? '?erro' : '/'));
-      exit;
+      $resposta = json_decode(file_get_contents(API_URL."/user/signup/intranet/$usuario/$token"),true);
+      $erro = $resposta['erro'] ?: '';
+  } else {
+      $_POST['cmd'] == 'Gerar' or $token = '';
+      $erro = $db->exec("UPDATE users SET token = '$token' WHERE id_ufrj = '$usuario'") ? '' : 'Ocorreu um problema, tente novamente!';
   }
-  $_POST['cmd'] == 'Gerar' or $token = '';
-  header('Location: /token'. ($db->exec("UPDATE users SET token = '$token' WHERE id_ufrj = '$usuario'") ? '/' : '?erro'));
-  exit;
 }
 $_SESSION['token'] = $token;
 
@@ -64,12 +64,12 @@ function(isConfirm) {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="icon" type="image/png" href="http://caronae.tic.ufrj.br/favicon-32x32.png" sizes="32x32">
-    <link rel="icon" type="image/png" href="http://caronae.tic.ufrj.br/favicon-96x96.png" sizes="96x96">
-    <link rel="icon" type="image/png" href="http://caronae.tic.ufrj.br/favicon-16x16.png" sizes="16x16">
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
 
-    <link rel="stylesheet" type="text/css" href="http://caronae.tic.ufrj.br/vendor/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="http://caronae.tic.ufrj.br/css/token/main.css">
+    <link rel="stylesheet" type="text/css" href="/vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/token/main.css">
 </head>
 <body>
 <div class="container-fluid">
@@ -89,7 +89,7 @@ function(isConfirm) {
         <div class="container-fluid">
             <div class="row">
                 <div class="col-sm-8 col-sm-offset-2 text">
-                    <img src="http://caronae.tic.ufrj.br/images/logo_caronae_with_text.png">
+                    <img src="/images/logo_caronae_with_text.png">
                 </div>
             </div>
             <div class="row">
@@ -106,9 +106,9 @@ function(isConfirm) {
                         </div>
                     </div>
                     <div class="form-bottom">
-                        <?php if ($_SERVER["QUERY_STRING"]): ?>
+                        <?php if ($erro): ?>
                             <p class="alert alert-danger">
-                                <span style="font-size: 18px">Ocorreu um problema, tente novamente.</span>
+                                <span style="font-size: 18px"><?= $erro ?></span>
                             </p>
                         <?php endif; ?>
 
@@ -146,7 +146,7 @@ function(isConfirm) {
 
 </div>
 
-<script src="http://caronae.tic.ufrj.br/js/token/clipboard.min.js"></script>
+<script src="/js/token/clipboard.min.js"></script>
 <script>
     var clipboard = new Clipboard('.token');
 
