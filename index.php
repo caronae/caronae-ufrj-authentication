@@ -12,8 +12,9 @@ $app_token = ($consulta->rowCount())? $consulta->fetchColumn() : NULL;
 $erro = '';
 if ($_POST['token'] && $_SESSION['token'] == $_POST['token']) {
   if (!isset($app_token)) {
-      $resposta = json_decode(file_get_contents(API_URL."/user/signup/intranet/$usuario/$token"),true);
-      $erro = $resposta['erro'] ? 'ERRO:'. $resposta['erro'] : '';
+      $context = stream_context_create(['http' => ['ignore_errors' => true]]);
+      $resposta = json_decode(file_get_contents(API_URL."/user/signup/intranet/$usuario/$token", false, $context),true);
+      $erro = $resposta['error'] ?: '';
   } else {
       $_POST['cmd'] == 'Gerar' or $token = '';
       $erro = $db->exec("UPDATE users SET token = '$token' WHERE id_ufrj = '$usuario'") ? '' : 'Ocorreu um problema, tente novamente!';
