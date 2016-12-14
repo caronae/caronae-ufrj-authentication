@@ -124,7 +124,8 @@ function(isConfirm) {
 
                         <form method="POST">
                             <div class="form-group">
-                            <input type="hidden" name="token" value="<?= $token ?>"/>
+                            <input type="hidden" name="token" value="<?= $token ?>">
+                            <input type="hidden" name="user" value="<?= $usuario ?>" id="user">
                             <button type="submit" class="button btn btn-block btn-success" name="cmd" value="Gerar">
                                 <?php if ($app_token) : ?>
                                     <span class="glyphicon glyphicon-refresh"></span>
