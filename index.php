@@ -62,7 +62,6 @@ function(isConfirm) {
 
 <html>
 <head>
-    
     <title>Obter Chave | Caronaê</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -124,17 +123,20 @@ function(isConfirm) {
 
                         <form method="POST">
                             <div class="form-group">
-                            <input type="hidden" name="token" value="<?= $token ?>">
-                            <input type="hidden" name="user" value="<?= $usuario ?>" id="user">
-                            <button type="submit" class="button btn btn-block btn-success" name="cmd" value="Gerar">
-                                <?php if ($app_token) : ?>
-                                    <span class="glyphicon glyphicon-refresh"></span>
-                                    <span>Nova Chave</span>
-                                <?php else : ?>
-                                    <span class="glyphicon glyphicon-certificate"></span>
-                                    <span>Gerar Chave</span>
-                                <?php endif; ?>
-                            </button>
+                                <input type="hidden" name="token" value="<?= $token ?>">
+                                <input type="hidden" name="user" id="user" value="<?= $usuario ?>">
+                                <input type="hidden" name="app_token" id="app_token" value="<?= $app_token ?>">
+
+                                <button type="submit" class="button btn btn-block btn-success" name="cmd" value="Gerar">
+                                    <?php if ($app_token) : ?>
+                                        <span class="glyphicon glyphicon-refresh"></span>
+                                        <span>Nova chave</span>
+                                    <?php else : ?>
+                                        <span class="glyphicon glyphicon-certificate"></span>
+                                        <span>Gerar chave</span>
+                                    <?php endif; ?>
+                                </button>
+                                
                                 <?php if ($app_token) : ?>
                                     <button type="submit" class="button btn btn-block remove" name="cmd" value="Invalidar">
                                         Remover chave
@@ -153,6 +155,19 @@ function(isConfirm) {
 
 <script src="/js/token/clipboard.min.js"></script>
 <script>
+    function getCredentials() {
+        var user = document.querySelector('#user').value;
+        var token = document.querySelector('#app_token').value;
+        return {
+            user: user,
+            token: token
+        };
+    }
+
+    function getCredentialsJSON() {
+        return JSON.stringify(getCredentials());
+    }
+
     var clipboard = new Clipboard('.token');
 
     clipboard.on('success', function(e) {
