@@ -27,7 +27,7 @@ $_SESSION['token'] = $token;
 
 function phpAlert() {
     echo '
-<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-latest.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/sweetalert2/0.4.5/sweetalert2.css">
 <script src="https://cdn.jsdelivr.net/sweetalert2/0.4.5/sweetalert2.min.js"></script>
 <script>
