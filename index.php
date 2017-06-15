@@ -1,68 +1,42 @@
 <?php
+
 require '.env';
 require __DIR__ . '/vendor/autoload.php';
+
+session_start();
+
 phpCAS::client(CAS_VERSION_2_0, 'cas.ufrj.br', 443, '');
 phpCAS::setNoCasServerValidation();
 phpCAS::forceAuthentication();
-$usuario = phpCAS::getUser();
+
+$user_id = phpCAS::getUser();
 $token = strtoupper(substr(base_convert(sha1(uniqid() . rand()), 16, 36), 0, 6));
-$db = new PDO('pgsql:dbname='.DB_NAME.';host='.DB_HOST.';', DB_USER, DB_PASSWORD);
-$consulta = $db->query("SELECT token FROM users WHERE id_ufrj = '$usuario' ");
-$app_token = ($consulta->rowCount())? $consulta->fetchColumn() : NULL;
-$erro = '';
-if ($_POST['token'] && $_SESSION['token'] == $_POST['token']) {
-  if (!isset($app_token)) {
-      $context = stream_context_create(['http' => ['ignore_errors' => true]]);
-      $resposta = json_decode(file_get_contents(API_URL."/user/signup/intranet/$usuario/$token", false, $context),true);
-      $erro = $resposta['error'] ?: '';
-  } else {
-      $_POST['cmd'] == 'Gerar' or $token = '';
-      $erro = $db->exec("UPDATE users SET token = '$token' WHERE id_ufrj = '$usuario'") ? '' : 'Ocorreu um problema, tente novamente!';
-      if (!$erro) {
-         header('Location: /chave');
-      }
-  }
+$db = new PDO('pgsql:dbname=' . DB_NAME . ';host=' . DB_HOST . ';', DB_USER, DB_PASSWORD);
+$db_query = $db->query("SELECT token FROM users WHERE id_ufrj = '$user_id' ");
+$app_token = ($db_query->rowCount()) ? $db_query->fetchColumn() : null;
+$error = null;
+
+if (@$_POST['token'] && @$_SESSION['token'] == $_POST['token']) {
+    if (!isset($app_token)) {
+        $context = stream_context_create(['http' => ['ignore_errors' => true]]);
+        $resposta = json_decode(file_get_contents(API_URL . "/user/signup/intranet/$user_id/$token", false, $context), true);
+        $error = $resposta['error'] ?: '';
+    } else {
+        $_POST['cmd'] == 'Gerar' or $token = '';
+        $error = $db->exec("UPDATE users SET token = '$token' WHERE id_ufrj = '$user_id'") ? '' : 'Não foi possível atualizar a chave do usuário.';
+        if (!$error) {
+            header('Location: /chave');
+        }
+    }
 }
+
 $_SESSION['token'] = $token;
 
-function phpAlert() {
-    echo '
-<script type="text/javascript" src="https://code.jquery.com/jquery-latest.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/sweetalert2/0.4.5/sweetalert2.css">
-<script src="https://cdn.jsdelivr.net/sweetalert2/0.4.5/sweetalert2.min.js"></script>
-<script>
-    swal({
-          title: "Você já leu nossos termos e condições de uso?",
-          text: "Para obter sua chave de acesso, você deve ler e concordar com nossos termos e condições de uso.",
-          type: "warning",
-          showCancelButton: true,
-          confirmButtonColor: "#3085d6",
-          cancelButtonColor: "#d33",
-          confirmButtonText: "Ok, li e concordo!",
-          cancelButtonText: "Ler termos de uso",
-          confirmButtonClass: "btn btn-success",
-          cancelButtonClass: "btn btn-danger",
-          buttonsStyling: false,
-          closeOnConfirm: true,
-          closeOnCancel: false,
-          allowOutsideClick: false
-          },
-function(isConfirm) {
-  if (isConfirm === true) {
-    // confirmation closes window
-  } else if (isConfirm === false) {
-    window.open("//docs.google.com/viewerng/viewer?url=https://caronae.ufrj.br/termos_de_uso.pdf");
-  } else {
-    // outside click, not allowed
-  }
-})
-</script>';
-}
 ?>
-
 <html>
 <head>
     <title>Obter Chave | Caronaê</title>
+
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -71,9 +45,11 @@ function(isConfirm) {
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
     <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
 
-    <link rel="stylesheet" type="text/css" href="/vendor/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="/css/token/main.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/sweetalert.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
 </head>
+
 <body>
 <div class="container-fluid">
     <div class="row">
@@ -92,7 +68,7 @@ function(isConfirm) {
         <div class="container-fluid">
             <div class="row">
                 <div class="col-sm-8 col-sm-offset-2 text">
-                    <img src="/images/logo_caronae_with_text.png">
+                    <img src="images/logo.png">
                 </div>
             </div>
             <div class="row">
@@ -102,17 +78,18 @@ function(isConfirm) {
                             <?php if ($app_token) : ?>
                                 <h3>Você já tem uma chave Caronaê!</h3>
                                 <p>Para criar uma nova basta clicar em "Nova Chave".</p>
-                            <?php else : phpAlert() ?>
+                            <?php else : ?>
                                 <h3>Obtenha a sua chave do Caronaê!</h3>
                                 <p>Basta clicar em "Gerar Chave":</p>
                             <?php endif; ?>
                         </div>
                     </div>
                     <div class="form-bottom">
-                        <?php if ($erro): ?>
-                            <p class="alert alert-danger">
-                                <span style="font-size: 18px"><?= $erro ?></span>
-                            </p>
+                        <?php if ($error): ?>
+                            <div class="alert alert-danger error">
+                                <div class="title">Ops! Algo deu errado. Por favor, tente novamente.</div>
+                                <div class="message">Erro: <?= $error ?></div>
+                            </div>
                         <?php endif; ?>
 
                         <?php if ($app_token) : ?>
@@ -124,7 +101,7 @@ function(isConfirm) {
                         <form method="POST">
                             <div class="form-group">
                                 <input type="hidden" name="token" value="<?= $token ?>">
-                                <input type="hidden" name="user" id="user" value="<?= $usuario ?>">
+                                <input type="hidden" name="user" id="user" value="<?= $user_id ?>">
                                 <input type="hidden" name="app_token" id="app_token" value="<?= $app_token ?>">
 
                                 <button type="submit" class="button btn btn-block btn-success" name="cmd" value="Gerar">
@@ -136,7 +113,7 @@ function(isConfirm) {
                                         <span>Gerar chave</span>
                                     <?php endif; ?>
                                 </button>
-                                
+
                                 <?php if ($app_token) : ?>
                                     <button type="submit" class="button btn btn-block remove" name="cmd" value="Invalidar">
                                         Remover chave
@@ -153,41 +130,15 @@ function(isConfirm) {
 
 </div>
 
-<script src="/js/token/clipboard.min.js"></script>
+<script src="js/sweetalert.min.js"></script>
+<script src="js/clipboard.min.js"></script>
+<script src="js/chave.js"></script>
+
+<?php if (!$app_token && !$error) : ?>
 <script>
-    function getCredentials() {
-        var user = document.querySelector('#user').value;
-        var token = document.querySelector('#app_token').value;
-        return {
-            user: user,
-            token: token
-        };
-    }
-
-    function getCredentialsJSON() {
-        return JSON.stringify(getCredentials());
-    }
-
-    var clipboard = new Clipboard('.token');
-
-    clipboard.on('success', function(e) {
-        document.querySelector('.copy-text').innerHTML =
-            '<span class="text-success" style="font-size:2em">' +
-                'Copiado! Agora é só colar no app do Caronaê.' +
-            '</span>';
-
-        e.clearSelection();
-    });
-
-    clipboard.on('error', function(e) {
-        document.querySelector('.copy-text').innerHTML =
-            '<span class="text-danger" style="font-size:2em">' +
-                'Erro... É preciso copiar manualmente.' +
-            '</span>';
-    });
-
+    displayTermsAlert();
 </script>
-
+<?php endif; ?>
 
 </body>
 </html>
