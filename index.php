@@ -1,7 +1,7 @@
 <?php
 
-require '../.env';
-require __DIR__ . '/../vendor/autoload.php';
+require '.env';
+require __DIR__ . '/vendor/autoload.php';
 
 session_start();
 
