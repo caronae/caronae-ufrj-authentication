@@ -5,8 +5,7 @@ namespace Caronae;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 
-define('SIGA_SEARCH_URL', 'https://api.myjson.com/bins/7xton');
-// define('SIGA_SEARCH_URL', 'http://146.164.2.117:9200/_search');
+define('SIGA_SEARCH_URL', 'http://146.164.2.117:9200/_search');
 
 class SigaService
 {
