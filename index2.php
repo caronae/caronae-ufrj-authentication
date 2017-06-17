@@ -3,29 +3,20 @@
 require '.env';
 require __DIR__ . '/vendor/autoload.php';
 
-use Caronae\CaronaeService;
-use Caronae\CaronaeSigaAdaptor;
-use Caronae\SigaService;
+use Caronae\CaronaeUFRJAgent;
 
 phpCAS::client(CAS_VERSION_2_0, 'cas.ufrj.br', 443, '');
 phpCAS::setNoCasServerValidation();
 phpCAS::forceAuthentication();
 
-$siga = new SigaService;
-$caronae = new CaronaeService(CARONAE_API_URL);
-$caronae->setInstitution(CARONAE_INSTITUTION_ID, CARONAE_INSTITUTION_PASSWORD);
-$adaptor = new CaronaeSigaAdaptor;
-
 $app_token = null;
 $error = null;
+$agent = new CaronaeUFRJAgent();
 
 try {
-    $user_id = phpCAS::getUser();
-    $siga_user = $siga->getProfileById($user_id);
-    $user = $adaptor->convertToCaronaeUser($siga_user);
-
-    $user = $caronae->signUp($user);
-    $app_token = $user->token;
+    $id_ufrj = phpCAS::getUser();
+    $agent->createOrUpdateUserWithUfrjId($id_ufrj);
+    $app_token = $agent->getCaronaeToken();
 } catch (Exception $exception) {
     $error = $exception->getMessage();
 }
@@ -98,7 +89,7 @@ try {
 
                         <form method="POST">
                             <div class="form-group">
-                                <input type="hidden" name="user" id="user" value="<?= $user_id ?>">
+                                <input type="hidden" name="user" id="user" value="<?= $id_ufrj ?>">
                                 <input type="hidden" name="app_token" id="app_token" value="<?= $app_token ?>">
 
                                 <button type="submit" class="button btn btn-block btn-success" name="cmd" value="Gerar">
