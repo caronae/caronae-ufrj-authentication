@@ -1,5 +1,18 @@
 {
+    "name": "caronae/caronae-chave",
+    "authors": [
+        {
+            "name": "Mario Cecchi",
+            "email": "macecchi@gmail.com"
+        }
+    ],
     "require": {
-        "jasig/phpcas": "^1.3"
+        "jasig/phpcas": "^1.3",
+        "guzzlehttp/guzzle": "^6.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Caronae\\": "src/"
+        }
     }
 }

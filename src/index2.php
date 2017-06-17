@@ -1,36 +1,44 @@
 <?php
 
-require '.env';
-require __DIR__ . '/vendor/autoload.php';
+require '../.env';
+require __DIR__ . '/../vendor/autoload.php';
 
-session_start();
+use Caronae\CaronaeService;
+use Caronae\SigaService;
 
 phpCAS::client(CAS_VERSION_2_0, 'cas.ufrj.br', 443, '');
 phpCAS::setNoCasServerValidation();
 phpCAS::forceAuthentication();
 
-$user_id = phpCAS::getUser();
-$token = strtoupper(substr(base_convert(sha1(uniqid() . rand()), 16, 36), 0, 6));
-$db = new PDO('pgsql:dbname=' . DB_NAME . ';host=' . DB_HOST . ';', DB_USER, DB_PASSWORD);
-$db_query = $db->query("SELECT token FROM users WHERE id_ufrj = '$user_id' ");
-$app_token = ($db_query->rowCount()) ? $db_query->fetchColumn() : null;
+$siga = new SigaService;
+$caronae = new CaronaeService(CARONAE_API_URL);
+$caronae->setInstitution(CARONAE_INSTITUTION_ID, CARONAE_INSTITUTION_PASSWORD);
+
+$app_token = null;
 $error = null;
 
-if (@$_POST['token'] && @$_SESSION['token'] == $_POST['token']) {
-    if (!isset($app_token)) {
-        $context = stream_context_create(['http' => ['ignore_errors' => true]]);
-        $resposta = json_decode(file_get_contents(API_URL . "/user/signup/intranet/$user_id/$token", false, $context), true);
-        $error = $resposta['error'] ?: '';
-    } else {
-        $_POST['cmd'] == 'Gerar' or $token = '';
-        $error = $db->exec("UPDATE users SET token = '$token' WHERE id_ufrj = '$user_id'") ? '' : 'Não foi possível atualizar a chave do usuário.';
-        if (!$error) {
-            header('Location: /chave');
-        }
-    }
+try {
+    $user_id = phpCAS::getUser();
+    $siga_user = $siga->getProfileById($user_id);
+    $user = caronaeUserFromSigaUser($siga_user);
+
+    $user = $caronae->signUp($user);
+    $app_token = $user->token;
+} catch (Exception $exception) {
+    $error = $exception->getMessage();
 }
 
-$_SESSION['token'] = $token;
+function caronaeUserFromSigaUser($sigaUser)
+{
+    return [
+        'name' => $sigaUser->nome,
+        'id_ufrj' => $sigaUser->IdentificacaoUFRJ,
+        'course' => $sigaUser->nomeCurso,
+        'profile' => $sigaUser->nivel,
+        'profile_pic_url' => $sigaUser->urlFoto
+    ];
+}
+
 
 ?>
 <html>
@@ -46,8 +54,8 @@ $_SESSION['token'] = $token;
     <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="css/sweetalert.css">
-    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <link rel="stylesheet" type="text/css" href="../css/sweetalert.css">
+    <link rel="stylesheet" type="text/css" href="../css/main.css">
 </head>
 
 <body>
@@ -68,7 +76,7 @@ $_SESSION['token'] = $token;
         <div class="container-fluid">
             <div class="row">
                 <div class="col-sm-8 col-sm-offset-2 text">
-                    <img src="images/logo.png">
+                    <img src="../images/logo.png">
                 </div>
             </div>
             <div class="row">
@@ -100,7 +108,6 @@ $_SESSION['token'] = $token;
 
                         <form method="POST">
                             <div class="form-group">
-                                <input type="hidden" name="token" value="<?= $token ?>">
                                 <input type="hidden" name="user" id="user" value="<?= $user_id ?>">
                                 <input type="hidden" name="app_token" id="app_token" value="<?= $app_token ?>">
 
@@ -130,14 +137,14 @@ $_SESSION['token'] = $token;
 
 </div>
 
-<script src="js/sweetalert.min.js"></script>
-<script src="js/clipboard.min.js"></script>
-<script src="js/chave.js"></script>
+<script src="../js/sweetalert.min.js"></script>
+<script src="../js/clipboard.min.js"></script>
+<script src="../js/chave.js"></script>
 
 <?php if (!$app_token && !$error) : ?>
-<script>
-    displayTermsAlert();
-</script>
+    <script>
+        displayTermsAlert();
+    </script>
 <?php endif; ?>
 
 </body>
