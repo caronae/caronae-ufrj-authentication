@@ -23,7 +23,7 @@ class SigaService
         try {
             $response = $this->client->get(SIGA_SEARCH_URL, ['query' => ['q' => 'IdentificacaoUFRJ:' . $id]]);
         } catch (RequestException $e) {
-            throw new SigaException('Failed to connect to SIGA.');
+            throw new SigaException('Não foi possível conectar ao SIGA.');
         }
 
         // Decode JSON
@@ -34,7 +34,7 @@ class SigaService
 
         // Check if we found a hit
         if (empty($intranetResponse->hits->hits)) {
-            throw new SigaException('No UFRJ profile found with this identification.');
+            throw new SigaException('Não foi possível localizar o usuário no SIGA.');
         }
 
         $intranetUser = $intranetResponse->hits->hits[0]->_source;
@@ -42,12 +42,12 @@ class SigaService
         // Check if the extracted user has all the required fields
         if (!isset($intranetUser->nome) || !isset($intranetUser->nomeCurso) ||
             !isset($intranetUser->situacaoMatricula) || !isset($intranetUser->nivel)) {
-            throw new SigaException('Unexpected response from SIGA.');
+            throw new SigaException('O SIGA retornou uma resposta inesperada.');
         }
 
         // Check if the user is still enrolled
         if ($intranetUser->situacaoMatricula != "Ativa") {
-            throw new SigaException('User does not have an active profile from SIGA.');
+            throw new SigaException('O usuário não possui matrícula ativa no SIGA.');
         }
 
         return $intranetUser;
