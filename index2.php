@@ -4,6 +4,7 @@ require '.env';
 require __DIR__ . '/vendor/autoload.php';
 
 use Caronae\CaronaeService;
+use Caronae\CaronaeSigaAdaptor;
 use Caronae\SigaService;
 
 phpCAS::client(CAS_VERSION_2_0, 'cas.ufrj.br', 443, '');
@@ -13,6 +14,7 @@ phpCAS::forceAuthentication();
 $siga = new SigaService;
 $caronae = new CaronaeService(CARONAE_API_URL);
 $caronae->setInstitution(CARONAE_INSTITUTION_ID, CARONAE_INSTITUTION_PASSWORD);
+$adaptor = new CaronaeSigaAdaptor;
 
 $app_token = null;
 $error = null;
@@ -20,25 +22,13 @@ $error = null;
 try {
     $user_id = phpCAS::getUser();
     $siga_user = $siga->getProfileById($user_id);
-    $user = caronaeUserFromSigaUser($siga_user);
+    $user = $adaptor->convertToCaronaeUser($siga_user);
 
     $user = $caronae->signUp($user);
     $app_token = $user->token;
 } catch (Exception $exception) {
     $error = $exception->getMessage();
 }
-
-function caronaeUserFromSigaUser($sigaUser)
-{
-    return [
-        'name' => $sigaUser->nome,
-        'id_ufrj' => $sigaUser->IdentificacaoUFRJ,
-        'course' => $sigaUser->nomeCurso,
-        'profile' => $sigaUser->nivel,
-        'profile_pic_url' => $sigaUser->urlFoto
-    ];
-}
-
 
 ?>
 <html>
