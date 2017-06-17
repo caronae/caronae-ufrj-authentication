@@ -54,8 +54,8 @@ function caronaeUserFromSigaUser($sigaUser)
     <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="../css/sweetalert.css">
-    <link rel="stylesheet" type="text/css" href="../css/main.css">
+    <link rel="stylesheet" type="text/css" href="css/sweetalert.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
 </head>
 
 <body>
@@ -76,7 +76,7 @@ function caronaeUserFromSigaUser($sigaUser)
         <div class="container-fluid">
             <div class="row">
                 <div class="col-sm-8 col-sm-offset-2 text">
-                    <img src="../images/logo.png">
+                    <img src="images/logo.png">
                 </div>
             </div>
             <div class="row">
@@ -137,9 +137,9 @@ function caronaeUserFromSigaUser($sigaUser)
 
 </div>
 
-<script src="../js/sweetalert.min.js"></script>
-<script src="../js/clipboard.min.js"></script>
-<script src="../js/chave.js"></script>
+<script src="js/sweetalert.min.js"></script>
+<script src="js/clipboard.min.js"></script>
+<script src="js/chave.js"></script>
 
 <?php if (!$app_token && !$error) : ?>
     <script>
