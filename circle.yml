@@ -5,6 +5,8 @@ machine:
 dependencies:
   override:
     - composer install --no-interaction --no-ansi
+  cache_directories:
+    - "vendor"
 
 test:
   override:
