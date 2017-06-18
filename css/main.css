@@ -148,33 +148,8 @@ img { max-width: 100%; }
 .btn-link-2:hover, .btn-link-2:focus,
 .btn-link-2:active, .btn-link-2:active:focus { outline: 0; opacity: 0.6; background: rgba(0, 0, 0, 0.3); color: #fff; }
 
-
-/***** Top content *****/
-
-.inner-bg {
-    padding: 100px 0 170px 0;
-}
-
-.top-content .text {
-    color: #fff;
-}
-
-.top-content .text h1 { color: #6e6e70; }
-
-.top-content .description {
-    margin: 20px 0 10px 0;
-}
-
-.top-content .description p { opacity: 0.8; }
-
-.top-content .description a {
-    color: #fff;
-}
-.top-content .description a:hover,
-.top-content .description a:focus { border-bottom: 1px dotted #fff; }
-
-.form-box {
-    margin-top: 35px;
+.logo {
+    margin: 8vw auto;
 }
 
 .form-top {
@@ -240,9 +215,6 @@ h2.token {
     h2.token {
         font-size: 4em;
     }
-    .inner-bg {
-        padding-top: 2em;
-    }
 }
 
 .header-line {
@@ -279,4 +251,16 @@ h2.token {
 
 .error .message {
     font-size: 0.8em;
+}
+
+.terms-alert {
+    text-align: center;
+}
+
+.terms-alert h2 {
+    font-size: 2em;
+}
+
+.terms-alert .icon {
+    font-size: 40px;
 }

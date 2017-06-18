@@ -9,16 +9,18 @@ phpCAS::client(CAS_VERSION_2_0, 'cas.ufrj.br', 443, '');
 phpCAS::setNoCasServerValidation();
 phpCAS::forceAuthentication();
 
+$id_ufrj = phpCAS::getUser();
 $app_token = null;
 $error = null;
 $agent = new CaronaeUFRJAgent();
 
-try {
-    $id_ufrj = phpCAS::getUser();
-    $agent->createOrUpdateUserWithUfrjId($id_ufrj);
-    $app_token = $agent->getCaronaeToken();
-} catch (Exception $exception) {
-    $error = $exception->getMessage();
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    try {
+        $agent->createOrUpdateUserWithUfrjId($id_ufrj);
+        $app_token = $agent->getCaronaeToken();
+    } catch (Exception $exception) {
+        $error = $exception->getMessage();
+    }
 }
 
 ?>
@@ -35,7 +37,6 @@ try {
     <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="css/sweetalert.css">
     <link rel="stylesheet" type="text/css" href="css/main.css">
 </head>
 
@@ -56,23 +57,19 @@ try {
     <div class="inner-bg">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-sm-8 col-sm-offset-2 text">
+                <div class="col-sm-12 logo">
                     <img src="images/logo.png">
                 </div>
             </div>
             <div class="row">
                 <div class="col-sm-6 col-sm-offset-3 form-box">
-                    <div class="form-top">
-                        <div class="form-top-left">
-                            <?php if ($app_token) : ?>
-                                <h3>Você já tem uma chave Caronaê!</h3>
-                                <p>Para criar uma nova basta clicar em "Nova Chave".</p>
-                            <?php else : ?>
-                                <h3>Obtenha a sua chave do Caronaê!</h3>
-                                <p>Basta clicar em "Gerar Chave":</p>
-                            <?php endif; ?>
+                    <?php if ($app_token) : ?>
+                        <div class="form-top">
+                            <div class="form-top-left">
+                                    <h3>Você já tem uma chave Caronaê!</h3>
+                            </div>
                         </div>
-                    </div>
+                    <?php endif; ?>
                     <div class="form-bottom">
                         <?php if ($error): ?>
                             <div class="alert alert-danger error">
@@ -92,20 +89,24 @@ try {
                                 <input type="hidden" name="user" id="user" value="<?= $id_ufrj ?>">
                                 <input type="hidden" name="app_token" id="app_token" value="<?= $app_token ?>">
 
-                                <button type="submit" class="button btn btn-block btn-success" name="cmd" value="Gerar">
-                                    <?php if ($app_token) : ?>
-                                        <span class="glyphicon glyphicon-refresh"></span>
-                                        <span>Nova chave</span>
-                                    <?php else : ?>
-                                        <span class="glyphicon glyphicon-certificate"></span>
-                                        <span>Gerar chave</span>
-                                    <?php endif; ?>
-                                </button>
+                                <?php if (!$app_token) : ?>
+                                    <div class="terms-alert">
+                                        <span class="icon glyphicon glyphicon-warning-sign"></span>
+                                        <h2>Você já leu nossos termos e condições de uso?</h2>
+                                        <p>
+                                            Para obter sua chave de acesso, você deve ler e concordar com nossos termos e condições de uso.
+                                        </p>
 
-                                <?php if ($app_token) : ?>
-                                    <button type="submit" class="button btn btn-block remove" name="cmd" value="Invalidar">
-                                        Remover chave
-                                    </button>
+                                        <button type="submit" class="button btn btn-block btn-primary" onclick="return openTermsOfUse()">
+                                            <span class="glyphicon glyphicon-list-alt"></span>
+                                            <span>Ler termos de uso</span>
+                                        </button>
+
+                                        <button type="submit" class="button btn btn-block btn-success">
+                                            <span class="glyphicon glyphicon-ok"></span>
+                                            <span>Li e aceito os termos</span>
+                                        </button>
+                                    </div>
                                 <?php endif; ?>
                             </div>
                         </form>
@@ -118,15 +119,8 @@ try {
 
 </div>
 
-<script src="js/sweetalert.min.js"></script>
 <script src="js/clipboard.min.js"></script>
 <script src="js/chave.js"></script>
-
-<?php if (!$app_token && !$error) : ?>
-    <script>
-        displayTermsAlert();
-    </script>
-<?php endif; ?>
 
 </body>
 </html>
