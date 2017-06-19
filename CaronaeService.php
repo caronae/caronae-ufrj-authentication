@@ -15,7 +15,7 @@ class CaronaeService
     private $institutionID;
     private $institutionPassword;
 
-    public function __construct(string $apiURL = PRODUCTION_API_URL, Client $client = null)
+    public function __construct(string $apiURL = self::PRODUCTION_API_URL, Client $client = null)
     {
         if ($client == null) {
             $client = new Client([
