@@ -7,7 +7,7 @@ class CaronaeUFRJAgent
     private $siga;
     private $caronae;
     private $adaptor;
-    private $caronae_user;
+    private $redirect_url;
 
     public function __construct()
     {
@@ -24,11 +24,15 @@ class CaronaeUFRJAgent
         $siga_user = $this->siga->getProfileById($id_ufrj);
         $user = $this->adaptor->convertToCaronaeUser($siga_user);
 
-        $this->caronae_user = $this->caronae->signUp($user);
+        $response = $this->caronae->signUp($user);
+        $this->redirect_url = $response->redirect_url;
+
+        $this->redirectToCaronae();
     }
 
-    public function getCaronaeToken()
+    private function redirectToCaronae()
     {
-        return $this->caronae_user->token;
+        header('Location: ' . $this->redirect_url, true, 302);
+        die;
     }
 }

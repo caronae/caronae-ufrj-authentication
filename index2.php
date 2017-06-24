@@ -17,7 +17,6 @@ $agent = new CaronaeUFRJAgent();
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     try {
         $agent->createOrUpdateUserWithUfrjId($id_ufrj);
-        $app_token = $agent->getCaronaeToken();
     } catch (Exception $exception) {
         $error = $exception->getMessage();
     }
