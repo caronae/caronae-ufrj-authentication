@@ -9,17 +9,20 @@ use Psr\Http\Message\ResponseInterface;
 class CaronaeService
 {
     const PRODUCTION_API_URL = "https://api.caronae.com.br";
-    const DEVELOPMENT_API_URL = "https://dev.caronae.com.br";
 
     private $client;
     private $institutionID;
     private $institutionPassword;
+    private $token;
+    private $apiURL;
 
     public function __construct(string $apiURL = self::PRODUCTION_API_URL, Client $client = null)
     {
+        $this->apiURL = $apiURL;
+
         if ($client == null) {
             $client = new Client([
-                'base_uri' => $apiURL,
+                'base_uri' => $this->apiURL,
                 'timeout' => 15.0,
             ]);
         }
@@ -47,7 +50,19 @@ class CaronaeService
             throw new CaronaeException("Invalid response from Caronae API (status code: " . $response->getStatusCode() . ")");
         }
 
-        return json_decode($response->getBody());
+        $response = json_decode($response->getBody());
+        $this->token = $response->token;
+        return $response;
+    }
+
+    public function redirectUrlForSuccess()
+    {
+        return $this->apiURL . '/login?token=' . $this->token;
+    }
+
+    public function redirectUrlForError(string $reason)
+    {
+        return $this->apiURL . '/login?error=' . $reason;
     }
 
     private function authorization()

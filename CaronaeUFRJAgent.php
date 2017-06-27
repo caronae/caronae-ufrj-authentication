@@ -14,7 +14,6 @@ class CaronaeUFRJAgent
     private $adaptor;
     private $id_ufrj;
     private $siga_user;
-    private $redirect_url;
 
     public function __construct()
     {
@@ -43,14 +42,13 @@ class CaronaeUFRJAgent
     public function sendUserToCaronae()
     {
         $user = $this->adaptor->convertToCaronaeUser($this->siga_user);
-
-        $response = $this->caronae->signUp($user);
-        $this->redirect_url = $response->redirect_url;
+        $this->caronae->signUp($user);
     }
 
-    public function redirectToCaronae()
+    public function redirectToCaronae($errorReason = null)
     {
-        header('Location: ' . $this->redirect_url, true, 302);
+        $redirect_url = empty($errorReason) ? $this->caronae->redirectUrlForSuccess() : $this->caronae->redirectUrlForError($errorReason);
+        header('Location: ' . $redirect_url, true, 302);
         die;
     }
 }
