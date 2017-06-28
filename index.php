@@ -20,6 +20,7 @@ if (@$_POST['token'] && @$_SESSION['token'] == $_POST['token']) {
     if (!isset($app_token)) {
         $context = stream_context_create(['http' => ['ignore_errors' => true]]);
         $resposta = json_decode(file_get_contents(API_URL . "/user/signup/intranet/$user_id/$token", false, $context), true);
+        $app_token = $token;
         $error = $resposta['error'] ?: '';
     } else {
         $_POST['cmd'] == 'Gerar' or $token = '';
