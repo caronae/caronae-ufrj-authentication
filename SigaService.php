@@ -29,7 +29,7 @@ class SigaService
         // Decode JSON
         $intranetResponse = json_decode($response->getBody());
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new SigaException('Error decoding response from SIGA.');
+            throw new SigaException('O SIGA retornou uma resposta inesperada.');
         }
 
         // Check if we found a hit
@@ -47,7 +47,7 @@ class SigaService
 
         // Check if the user is still enrolled
         if ($intranetUser->situacaoMatricula != "Ativa") {
-            throw new SigaException('O usuário não possui matrícula ativa no SIGA.');
+            throw new SigaException('O usuário não possui matrícula ativa no SIGA. Situação da matrícula: ' . $intranetUser->situacaoMatricula . '.');
         }
 
         return $intranetUser;
