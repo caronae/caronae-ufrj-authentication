@@ -1,5 +1,5 @@
 <?php
-http_redirect(CARONAE_API_URL . '/login');
+header('Location: ' . CARONAE_API_URL . '/login');
 exit;
 
 require '.env';
