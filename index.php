@@ -1,9 +1,9 @@
 <?php
-header('Location: ' . CARONAE_API_URL . '/login');
-exit;
-
 require '.env';
 require __DIR__ . '/vendor/autoload.php';
+
+header('Location: ' . CARONAE_API_URL . '/login');
+exit;
 
 session_start();
 
@@ -13,7 +13,7 @@ phpCAS::forceAuthentication();
 
 $user_id = phpCAS::getUser();
 $token = strtoupper(substr(base_convert(sha1(uniqid() . rand()), 16, 36), 0, 6));
-$db = new PDO('pgsql:dbname=' . DB_NAME . ';host=' . DB_HOST . ';', DB_USER, DB_PASSWORD);
+$db = new PDO('pgsql:dbname=' . DB_NAME 0. ';host=' . DB_HOST . ';', DB_USER, DB_PASSWORD);
 $db_query = $db->query("SELECT token FROM users WHERE id_ufrj = '$user_id' ");
 $app_token = ($db_query->rowCount()) ? $db_query->fetchColumn() : null;
 $error = null;
