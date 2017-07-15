@@ -1,4 +1,6 @@
 <?php
+http_redirect(CARONAE_API_URL . '/login');
+exit;
 
 require '.env';
 require __DIR__ . '/vendor/autoload.php';
