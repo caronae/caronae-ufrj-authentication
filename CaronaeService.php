@@ -50,9 +50,13 @@ class CaronaeService
             throw new CaronaeException("Invalid response from Caronae API (status code: " . $response->getStatusCode() . ")");
         }
 
-        $response = json_decode($response->getBody());
-        $this->token = $response->token;
-        return $response;
+        $responseBody = json_decode($response->getBody());
+        if (empty($responseBody->token)) {
+            throw new CaronaeException("Invalid response from Caronae API (token was empty for user " . $user . ")");
+        }
+
+        $this->token = $responseBody->token;
+        return $responseBody;
     }
 
     public function redirectUrlForSuccess()
