@@ -52,7 +52,7 @@ class CaronaeService
 
         $responseBody = json_decode($response->getBody());
         if (empty($responseBody->token)) {
-            throw new CaronaeException("Invalid response from Caronae API (token was empty for user " . $user . ")");
+            throw new CaronaeException("Invalid response from Caronae API (token was empty for user " . $user['id_ufrj'] . ")");
         }
 
         $this->token = $responseBody->token;
