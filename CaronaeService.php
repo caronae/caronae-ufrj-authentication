@@ -24,6 +24,7 @@ class CaronaeService
             $client = new Client([
                 'base_uri' => $this->apiURL,
                 'timeout' => 15.0,
+                'headers' => ['Accept' => 'application/json']
             ]);
         }
 
@@ -43,11 +44,12 @@ class CaronaeService
         try {
             $response = $this->client->post('/users', ['json' => $user, 'auth' => $this->authorization()]);
         } catch (RequestException $e) {
-            throw new CaronaeException($e->getMessage());
-        }
+            $response = $e->getResponse();
+            if (!$this->isResponseValid($response)) {
+                throw new CaronaeException("Invalid response from Caronae API (status code: " . $response->getStatusCode() . ")");
+            }
 
-        if (!$this->isResponseValid($response)) {
-            throw new CaronaeException("Invalid response from Caronae API (status code: " . $response->getStatusCode() . ")");
+            throw new CaronaeException($e->getMessage());
         }
 
         $responseBody = json_decode($response->getBody());
