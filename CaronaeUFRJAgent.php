@@ -42,7 +42,7 @@ class CaronaeUFRJAgent
     public function sendUserToCaronae()
     {
         $user = $this->adaptor->convertToCaronaeUser($this->siga_user);
-        $this->caronae->signUp($user);
+        $this->caronae->authorize($user);
     }
 
     public function redirectToCaronae($errorReason = null)
