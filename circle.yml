@@ -15,7 +15,7 @@ test:
 deployment:
   production:
     branch: master
-    owner: macecchi
+    owner: caronae
     commands:
       - ssh -A $CARONAE_PROD_USER@$CARONAE_PROD_HOST -p $CARONAE_PROD_PORT "cd ~/chave && git checkout . && git pull origin master && composer install --no-interaction --no-ansi --no-dev"
 
