@@ -15,3 +15,11 @@ O usuário pede pra fazer login no Caronaê e o Caronaê redireciona para a inst
 4. Redirecionamos de volta para a página de login do Caronaê passando o token obtido
 
 A partir daí o próprio Caronaê é responsável pela autenticação no app.
+
+## Documentação rápida
+
+- **phpCAS**: biblioteca que faz a integração com o [CAS](https://cas.ufrj.br/) (Central Authentication Service) da Intranet UFRJ, que valida que o usuário é vinculado à UFRJ
+-  **SigaService**: comunica com o SIGA UFRJ, de onde são buscados os dados dos usuários
+- **CaronaeService**: parte do [caronae-sdk-php](https://github.com/caronae/caronae-sdk-php), é a classe que faz a comunicação com a API do Caronaê e é usada para enviar os dados do usuário para o Caronaê
+- **CaronaeSigaAdaptor**: faz a conversão dos dados no formato que vem do SIGA para o formato da API do Caronaê
+- **CaronaeUFRJAgent**: faz o fluxo de autenticação e autorização integrando todos os serviços acima
