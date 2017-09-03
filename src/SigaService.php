@@ -5,8 +5,6 @@ namespace Caronae;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 
-define('SIGA_SEARCH_URL', 'http://146.164.2.117:9200/_search');
-
 class SigaService
 {
     protected $client;
@@ -21,7 +19,7 @@ class SigaService
     public function getProfileById($id)
     {
         try {
-            $response = $this->client->get(SIGA_SEARCH_URL, ['query' => ['q' => 'IdentificacaoUFRJ:' . $id]]);
+            $response = $this->client->get(getenv('SIGA_SEARCH_URL'), ['query' => ['q' => 'IdentificacaoUFRJ:' . $id]]);
         } catch (RequestException $e) {
             throw new SigaException('Não foi possível conectar ao SIGA.');
         }

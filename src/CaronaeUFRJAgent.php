@@ -4,9 +4,6 @@ namespace Caronae;
 
 use phpCAS;
 
-require '.env';
-require __DIR__ . '/vendor/autoload.php';
-
 class CaronaeUFRJAgent
 {
     private $siga;
@@ -19,8 +16,8 @@ class CaronaeUFRJAgent
     {
         $this->siga = new SigaService;
 
-        $this->caronae = new CaronaeService(CARONAE_API_URL);
-        $this->caronae->setInstitution(CARONAE_INSTITUTION_ID, CARONAE_INSTITUTION_PASSWORD);
+        $this->caronae = new CaronaeService(getenv('CARONAE_API_URL'));
+        $this->caronae->setInstitution(getenv('CARONAE_INSTITUTION_ID'), getenv('CARONAE_INSTITUTION_PASSWORD'));
 
         $this->adaptor = new CaronaeSigaAdaptor;
 
