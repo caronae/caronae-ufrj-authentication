@@ -21,8 +21,7 @@ class CaronaeUFRJAgent
 
         $this->adaptor = new CaronaeSigaAdaptor;
 
-        phpCAS::client(CAS_VERSION_2_0, 'cas.ufrj.br', 443, '');
-        phpCAS::setNoCasServerValidation();
+        $this->setupCAS();
     }
 
     public function authenticateWithIntranet()
@@ -47,5 +46,12 @@ class CaronaeUFRJAgent
         $redirect_url = empty($errorReason) ? $this->caronae->redirectUrlForSuccess() : $this->caronae->redirectUrlForError($errorReason);
         header('Location: ' . $redirect_url, true, 302);
         die;
+    }
+
+    private function setupCAS()
+    {
+        phpCAS::client(CAS_VERSION_2_0, 'cas.ufrj.br', 443, '');
+        phpCAS::setNoCasServerValidation();
+        phpCAS::setFixedServiceURL($_SERVER['REQUEST_URI']);
     }
 }
