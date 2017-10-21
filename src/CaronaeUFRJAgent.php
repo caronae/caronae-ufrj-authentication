@@ -52,6 +52,10 @@ class CaronaeUFRJAgent
     {
         phpCAS::client(CAS_VERSION_2_0, 'cas.ufrj.br', 443, '');
         phpCAS::setNoCasServerValidation();
-        phpCAS::setFixedServiceURL($_SERVER['REQUEST_URI']);
+
+        if (isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+            $url = $_SERVER['HTTP_X_FORWARDED_PROTO'] . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+            phpCAS::setFixedServiceURL($url);
+        }
     }
 }
