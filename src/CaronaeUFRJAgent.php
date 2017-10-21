@@ -4,9 +4,6 @@ namespace Caronae;
 
 use phpCAS;
 
-require '.env';
-require __DIR__ . '/vendor/autoload.php';
-
 class CaronaeUFRJAgent
 {
     private $siga;
@@ -19,13 +16,12 @@ class CaronaeUFRJAgent
     {
         $this->siga = new SigaService;
 
-        $this->caronae = new CaronaeService(CARONAE_API_URL);
-        $this->caronae->setInstitution(CARONAE_INSTITUTION_ID, CARONAE_INSTITUTION_PASSWORD);
+        $this->caronae = new CaronaeService(getenv('CARONAE_API_URL'));
+        $this->caronae->setInstitution(getenv('CARONAE_INSTITUTION_ID'), getenv('CARONAE_INSTITUTION_PASSWORD'));
 
         $this->adaptor = new CaronaeSigaAdaptor;
 
-        phpCAS::client(CAS_VERSION_2_0, 'cas.ufrj.br', 443, '');
-        phpCAS::setNoCasServerValidation();
+        $this->setupCAS();
     }
 
     public function authenticateWithIntranet()
@@ -50,5 +46,16 @@ class CaronaeUFRJAgent
         $redirect_url = empty($errorReason) ? $this->caronae->redirectUrlForSuccess() : $this->caronae->redirectUrlForError($errorReason);
         header('Location: ' . $redirect_url, true, 302);
         die;
+    }
+
+    private function setupCAS()
+    {
+        phpCAS::client(CAS_VERSION_2_0, 'cas.ufrj.br', 443, '');
+        phpCAS::setNoCasServerValidation();
+
+        if (isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+            $url = $_SERVER['HTTP_X_FORWARDED_PROTO'] . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+            phpCAS::setFixedServiceURL($url);
+        }
     }
 }

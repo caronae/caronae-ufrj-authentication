@@ -3,33 +3,43 @@ jobs:
   build:
     docker:
       - image: circleci/php:7.1-cli
-
     working_directory: ~/repo
-
     steps:
       - checkout
-
       - restore_cache:
           keys:
           - v1-dependencies-{{ checksum "composer.json" }}
           - v1-dependencies-
-
       - run: 
           name: Install dependencies
           command: composer install -n --prefer-dist
-
       - save_cache:
           paths:
             - ./vendor
           key: v1-dependencies-{{ checksum "composer.json" }}
-        
       - run: 
           name: Run tests
           command: ./vendor/bin/phpunit --log-junit $CIRCLE_TEST_REPORTS/phpunit/junit.xml tests/
-      
+      - setup_remote_docker:
+          version: 17.07.0-ce
+      - run:
+          name: Build Docker images
+          command: |
+            if [[ "$CIRCLE_BRANCH" = "develop" || "$CIRCLE_BRANCH" = "master" ]]; then
+              [[ "${CIRCLE_BRANCH}" = "master" ]] && TAG="latest" || TAG="${CIRCLE_BRANCH}"
+              docker build -t caronae/ufrj-authentication:$TAG .
+              docker login -u $DOCKER_USER -p $DOCKER_PASS
+              docker push caronae/ufrj-authentication:$TAG
+            fi
+      - deploy:
+          name: Deploy to dev
+          command: |
+            if [[ "$CIRCLE_BRANCH" = "develop" ]]; then
+              ssh -o StrictHostKeyChecking=No -A $CARONAE_DEV_USER@$CARONAE_DEV_HOST -p $CARONAE_DEV_PORT bash -s < scripts/update_images.sh "develop"
+            fi
       - deploy:
           name: Deploy to production
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              ssh -o "StrictHostKeyChecking no" -A $CARONAE_PROD_USER@$CARONAE_PROD_HOST -p $CARONAE_PROD_PORT "cd ~/chave && git checkout . && git pull origin master && composer install --no-interaction --no-ansi --no-dev"
+              ssh -o StrictHostKeyChecking=No -A $CARONAE_PROD_USER@$CARONAE_PROD_HOST -p $CARONAE_PROD_PORT bash -s < scripts/update_images.sh "latest"
             fi
