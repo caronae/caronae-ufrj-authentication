@@ -1,6 +1,7 @@
 FROM php:7.1-fpm-alpine
 
-WORKDIR /var/www/ufrj-authentication
+WORKDIR /var/www
+RUN rm -rf html
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
 
@@ -12,4 +13,4 @@ RUN composer install --no-ansi --no-interaction --no-dev
 
 COPY src ./src
 
-VOLUME /var/www/ufrj-authentication
+VOLUME /var/www
