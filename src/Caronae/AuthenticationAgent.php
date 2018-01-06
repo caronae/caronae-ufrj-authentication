@@ -45,7 +45,12 @@ class AuthenticationAgent
 
     public function redirectToCaronae($errorReason = null)
     {
-        $redirect_url = empty($errorReason) ? $this->caronae->redirectUrlForSuccess() : $this->caronae->redirectUrlForError($errorReason);
+        if (empty($errorReason)) {
+            $redirect_url = $this->caronae->redirectUrlForSuccess();
+        } else {
+            $redirect_url = $this->caronae->redirectUrlForError($errorReason);
+        }
+
         header('Location: ' . $redirect_url, true, 302);
         die;
     }

@@ -30,7 +30,10 @@ class CASService
 
     public function authenticate()
     {
+        ob_start();
         phpCAS::forceAuthentication();
+        ob_end_clean();
+
         return phpCAS::getUser();
     }
 }

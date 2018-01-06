@@ -12,7 +12,7 @@ class SigaService
     public function __construct()
     {
         $this->client = new Client([
-            'timeout'  => 5.0,
+            'timeout' => 5.0,
         ]);
     }
 
