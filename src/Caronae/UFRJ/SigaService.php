@@ -1,6 +1,6 @@
 <?php
 
-namespace Caronae;
+namespace Caronae\UFRJ;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
@@ -12,7 +12,7 @@ class SigaService
     public function __construct()
     {
         $this->client = new Client([
-            'timeout'  => 15.0,
+            'timeout' => 5.0,
         ]);
     }
 
