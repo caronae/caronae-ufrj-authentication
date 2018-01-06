@@ -3,8 +3,10 @@
 namespace Caronae;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 
 class HealthCheckServiceTest extends \PHPUnit_Framework_TestCase
@@ -44,7 +46,7 @@ class HealthCheckServiceTest extends \PHPUnit_Framework_TestCase
     {
         $mock = new MockHandler([new Response(200)]);
         $handler = HandlerStack::create($mock);
-        $client = new Client(['handler' => $handler]);
+        $client = new Client(['handler' => $handler, 'timeout' => 5.0]);
 
         $healthCheckService = new HealthCheckService($client);
 
@@ -54,9 +56,9 @@ class HealthCheckServiceTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function shouldBeFalseWhenConnectionWithSigaFails()
     {
-        $mock = new MockHandler([new Response(403)]);
+        $mock = new MockHandler([new RequestException('Error', new Request('GET', '/'))]);
         $handler = HandlerStack::create($mock);
-        $client = new Client(['handler' => $handler]);
+        $client = new Client(['handler' => $handler, 'timeout' => 5.0]);
 
         $healthCheckService = new HealthCheckService($client);
 
