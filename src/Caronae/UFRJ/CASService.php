@@ -10,6 +10,7 @@ class CASService
 
     public function setup()
     {
+        phpCAS::setDebug('php://stdout');
         phpCAS::client(CAS_VERSION_2_0, self::CAS_HOSTNAME, 443, '');
         phpCAS::setNoCasServerValidation();
 
