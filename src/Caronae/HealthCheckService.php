@@ -33,4 +33,16 @@ class HealthCheckService
 
         return $response->getStatusCode() == 200;
     }
+
+    public function checkSigaConnection()
+    {
+        try {
+            $sigaURL = getenv('SIGA_SEARCH_URL');
+            $response = $this->client->get($sigaURL);
+        } catch (RequestException $e) {
+            return false;
+        }
+
+        return $response->getStatusCode() == 200;
+    }
 }
