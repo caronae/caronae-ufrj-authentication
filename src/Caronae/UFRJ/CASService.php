@@ -26,7 +26,8 @@ class CASService
             return null;
         }
 
-        return $_SERVER['HTTP_X_FORWARDED_PROTO'] . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        return $_SERVER['HTTP_X_FORWARDED_PROTO'] . "://" . $_SERVER['HTTP_HOST'] . $path;
     }
 
     public function authenticate()
