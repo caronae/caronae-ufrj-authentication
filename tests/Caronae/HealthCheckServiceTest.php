@@ -46,7 +46,7 @@ class HealthCheckServiceTest extends \PHPUnit_Framework_TestCase
     {
         $mock = new MockHandler([new Response(200)]);
         $handler = HandlerStack::create($mock);
-        $client = new Client(['handler' => $handler, 'timeout' => 5.0]);
+        $client = new Client(['handler' => $handler]);
 
         $healthCheckService = new HealthCheckService($client);
 
@@ -58,7 +58,7 @@ class HealthCheckServiceTest extends \PHPUnit_Framework_TestCase
     {
         $mock = new MockHandler([new RequestException('Error', new Request('GET', '/'))]);
         $handler = HandlerStack::create($mock);
-        $client = new Client(['handler' => $handler, 'timeout' => 5.0]);
+        $client = new Client(['handler' => $handler]);
 
         $healthCheckService = new HealthCheckService($client);
 

@@ -14,7 +14,7 @@ class HealthCheckService
     {
         if ($client == null) {
             $this->client = new Client([
-                'timeout' => 15.0,
+                'timeout' => 5.0,
             ]);
         } else {
             $this->client = $client;
