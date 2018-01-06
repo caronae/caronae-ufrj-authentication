@@ -2,7 +2,7 @@
 
 namespace Caronae;
 
-class CaronaeSigaAdaptor
+class SigaToCaronaeAdaptor
 {
     public function convertToCaronaeUser($sigaUser)
     {

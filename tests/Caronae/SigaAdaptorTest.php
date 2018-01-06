@@ -1,10 +1,10 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
+namespace Caronae;
 
-use Caronae\CaronaeSigaAdaptor;
+use stdClass;
 
-class CaronaeSigaAdaptorTest extends PHPUnit_Framework_TestCase
+class SigaAdaptorTest extends \PHPUnit_Framework_TestCase
 {
     private $sigaUser;
 
@@ -21,7 +21,7 @@ class CaronaeSigaAdaptorTest extends PHPUnit_Framework_TestCase
 
         $this->sigaUser = $sigaUser;
 
-        $this->adaptor = new CaronaeSigaAdaptor();
+        $this->adaptor = new SigaToCaronaeAdaptor();
     }
 
     public function testConvertUser()

@@ -1,5 +1,5 @@
 {
-    "name": "caronae/caronae-chave",
+    "name": "caronae/ufrj-authentication",
     "authors": [
         {
             "name": "Mario Cecchi",
@@ -17,7 +17,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Caronae\\": "src/"
+            "Caronae\\": "src/Caronae/"
         }
     }
 }

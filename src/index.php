@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use Caronae\CaronaeUFRJAgent;
+use Caronae\AuthenticationAgent;
 use Dotenv\Dotenv;
 
 if (is_file(__DIR__ . '/.env')) {
@@ -10,7 +10,7 @@ if (is_file(__DIR__ . '/.env')) {
     $dotenv->load();
 }
 
-$agent = new CaronaeUFRJAgent();
+$agent = new AuthenticationAgent();
 $error = null;
 
 try {
