@@ -9,14 +9,16 @@ $errors = [];
 
 $cas = $healthCheck->checkCASConnection();
 if (!$cas) {
-    http_response_code(503);
     $errors[] = 'cas';
 }
 
 $siga = $healthCheck->checkSigaConnection();
 if (!$siga) {
-    http_response_code(503);
     $errors[] = 'siga';
+}
+
+if (!empty($errors)) {
+    header($_SERVER['SERVER_PROTOCOL'] . ' 503 Service Unavailable ' . json_encode($errors));
 }
 
 header('Content-type: application/json; charset=utf-8');
