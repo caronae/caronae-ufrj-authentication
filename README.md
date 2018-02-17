@@ -1,5 +1,7 @@
 # Caronaê - Autenticação com a UFRJ
 
+[![CircleCI](https://circleci.com/gh/caronae/caronae-ufrj-authentication.svg?style=svg)](https://circleci.com/gh/caronae/caronae-ufrj-authentication)
+
 Serviço de login com a UFRJ do Caronaê.
 
 
