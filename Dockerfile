@@ -1,5 +1,9 @@
 FROM caronae/php
 
+ENV LOG_STREAM="/tmp/ufrj-authentication.log"
+RUN mkfifo $LOG_STREAM && chmod 777 $LOG_STREAM
+CMD ["/bin/sh", "-c", "php-fpm -D | tail -f $LOG_STREAM"]
+
 WORKDIR /var/www/ufrj-authentication
 
 COPY composer.json ./
