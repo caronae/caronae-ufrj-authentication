@@ -21,18 +21,18 @@ class SigaService
         try {
             $response = $this->client->get(getenv('SIGA_SEARCH_URL'), ['query' => ['q' => 'IdentificacaoUFRJ:' . $id]]);
         } catch (RequestException $e) {
-            throw new SigaException('Não foi possível conectar ao SIGA.');
+            throw new SigaConnectionException();
         }
 
         // Decode JSON
         $intranetResponse = json_decode($response->getBody());
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new SigaException('O SIGA retornou uma resposta inesperada.');
+            throw new SigaUnexpectedResponseException();
         }
 
         // Check if we found a hit
         if (empty($intranetResponse->hits->hits)) {
-            throw new SigaException('Não foi possível localizar o usuário no SIGA.');
+            throw new SigaUserNotFoundException();
         }
 
         $intranetUser = $intranetResponse->hits->hits[0]->_source;
@@ -40,12 +40,12 @@ class SigaService
         // Check if the extracted user has all the required fields
         if (!isset($intranetUser->nome) || !isset($intranetUser->nomeCurso) ||
             !isset($intranetUser->situacaoMatricula) || !isset($intranetUser->nivel)) {
-            throw new SigaException('O SIGA retornou uma resposta inesperada.');
+            throw new SigaUnexpectedResponseException();
         }
 
         // Check if the user is still enrolled
         if ($intranetUser->situacaoMatricula != "Ativa") {
-            throw new SigaException('O usuário não possui matrícula ativa no SIGA. Situação da matrícula: ' . $intranetUser->situacaoMatricula . '.');
+            throw new SigaUserNotEnrolledException($intranetUser->situacaoMatricula);
         }
 
         return $intranetUser;
@@ -53,3 +53,24 @@ class SigaService
 }
 
 class SigaException extends \Exception {}
+
+class SigaConnectionException extends SigaException {
+    protected $message = 'Não foi possível conectar ao SIGA.';
+}
+
+class SigaUnexpectedResponseException extends SigaException {
+    protected $message = 'O SIGA retornou uma resposta inesperada.';
+}
+
+class SigaUnauthorizedException extends SigaException {}
+
+class SigaUserNotFoundException extends SigaUnauthorizedException {
+    protected $message = 'Não foi possível localizar o usuário no SIGA.';
+}
+
+class SigaUserNotEnrolledException extends SigaUnauthorizedException {
+    public function __construct($enrollment_status) {
+        $this->message = 'O usuário não possui matrícula ativa no SIGA. Situação da matrícula: ' . $enrollment_status . '.';
+    }
+}
+
