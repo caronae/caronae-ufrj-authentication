@@ -23,10 +23,9 @@ try {
     $error = 'Não foi possível autenticar com a Intranet UFRJ.';
 } catch (Exception $e) {
     $error = $e->getMessage();
-} finally {
     if (!($e instanceof SigaUnauthorizedException)) {
         Log::error($e);
     }
-
+} finally {
     $agent->redirectToCaronae($error);
 }
