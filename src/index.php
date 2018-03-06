@@ -4,6 +4,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use Caronae\AuthenticationAgent;
 use Caronae\Log;
+use Caronae\UFRJ\SigaConnectionException;
 use Caronae\UFRJ\SigaUnauthorizedException;
 use Dotenv\Dotenv;
 
@@ -23,7 +24,9 @@ try {
     $error = 'Não foi possível autenticar com a Intranet UFRJ.';
 } catch (Exception $e) {
     $error = $e->getMessage();
-    if (!($e instanceof SigaUnauthorizedException)) {
+    if ($e instanceof SigaConnectionException) {
+        Log::warning($e);
+    } else if (!($e instanceof SigaUnauthorizedException)) {
         Log::error($e);
     }
 } finally {
