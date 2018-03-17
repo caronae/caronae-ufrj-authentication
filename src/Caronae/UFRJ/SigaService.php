@@ -8,18 +8,23 @@ use GuzzleHttp\Exception\RequestException;
 class SigaService
 {
     protected $client;
+    private $searchURL;
 
-    public function __construct()
+    public function __construct(Client $client = null, $searchURL = null)
     {
-        $this->client = new Client([
-            'timeout' => 5.0,
-        ]);
+        $this->searchURL = is_null($searchURL) ? getenv('SIGA_SEARCH_URL') : $searchURL;
+        if ($client == null) {
+            $client = new Client([
+                'timeout' => 5.0,
+            ]);
+        }
+        $this->client = $client;
     }
 
     public function getProfileById($id)
     {
         try {
-            $response = $this->client->get(getenv('SIGA_SEARCH_URL'), ['query' => ['q' => 'IdentificacaoUFRJ:' . $id]]);
+            $response = $this->client->get($this->searchURL, ['query' => ['q' => 'IdentificacaoUFRJ:' . $id]]);
         } catch (RequestException $e) {
             throw new SigaConnectionException();
         }
@@ -44,7 +49,7 @@ class SigaService
         }
 
         // Check if the user is still enrolled
-        if ($intranetUser->situacaoMatricula != "Ativa") {
+        if (!preg_match('/ativ[ao]/i', $intranetUser->situacaoMatricula)) {
             throw new SigaUserNotEnrolledException($intranetUser->situacaoMatricula);
         }
 
