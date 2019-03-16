@@ -30,30 +30,31 @@ class SigaService
         }
 
         // Decode JSON
-        $intranetResponse = json_decode($response->getBody());
+        $sigaResponse = json_decode($response->getBody());
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new SigaUnexpectedResponseException();
         }
 
         // Check if we found a hit
-        if (empty($intranetResponse->hits->hits)) {
+        if (empty($sigaResponse->hits->hits)) {
             throw new SigaUserNotFoundException();
         }
 
-        $intranetUser = $intranetResponse->hits->hits[0]->_source;
+        $user = $sigaResponse->hits->hits[0]->_source;
 
         // Check if the extracted user has all the required fields
-        if (!isset($intranetUser->nome) || !isset($intranetUser->nomeCurso) ||
-            !isset($intranetUser->situacaoMatricula) || !isset($intranetUser->nivel)) {
+        if (!isset($user->nome) || !isset($user->nomeCurso) ||
+            !isset($user->situacaoMatricula) || !isset($user->nivel)) {
             throw new SigaUnexpectedResponseException();
         }
 
-        // Check if the user is still enrolled
-        if (!preg_match('/ativ[ao]/i', $intranetUser->situacaoMatricula)) {
-            throw new SigaUserNotEnrolledException($intranetUser->situacaoMatricula);
+        // Check if the student is still enrolled
+        $isEmployee = isset($user->alunoServidor) && $user->alunoServidor == '1';
+        if (!$isEmployee && !preg_match('/ativ[ao]/i', $user->situacaoMatricula)) {
+            throw new SigaUserNotEnrolledException($user->situacaoMatricula);
         }
 
-        return $intranetUser;
+        return $user;
     }
 }
 

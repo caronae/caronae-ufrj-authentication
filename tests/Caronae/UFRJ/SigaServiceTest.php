@@ -10,7 +10,7 @@ use GuzzleHttp\Psr7\Response;
 class SigaServiceTest extends \PHPUnit_Framework_TestCase
 {
     /** @test */
-    public function should_throw_when_user_does_not_have_active_enrollment()
+    public function should_throw_when_is_student_and_does_not_have_active_enrollment()
     {
         $service = $this->sigaServiceWithFakeResponse('Trancada');
 
@@ -19,7 +19,7 @@ class SigaServiceTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function should_return_user_with_active_enrollment()
+    public function should_return_student_with_active_enrollment()
     {
         $acceptedStatuses = ['Ativa', 'ATIVA', 'ativa', 'Ativo', 'ATIVO', 'ativo'];
 
@@ -30,8 +30,17 @@ class SigaServiceTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    private function sigaServiceWithFakeResponse($enrollmentStatus)
+    /** @test */
+    public function should_return_employee_with_inactive_enrollment()
     {
+        $service = $this->sigaServiceWithFakeResponse('Trancada', true);
+        $user = $service->getProfileById(1);
+        $this->assertNotNull($user);
+    }
+
+    private function sigaServiceWithFakeResponse($enrollmentStatus, $isEmployee = false)
+    {
+        $employeeStatus = $isEmployee ? 1 : 0;
         $body = '{
             "took":356,
             "timed_out":false,
@@ -52,7 +61,8 @@ class SigaServiceTest extends \PHPUnit_Framework_TestCase
                     "IdentificacaoUFRJ":"123456789",
                     "nome":"Fulando da Silva",
                     "situacaoMatricula":"' . $enrollmentStatus . '",
-                    "urlFoto":"http://example.com/picture.jpg"
+                    "urlFoto":"http://example.com/picture.jpg",
+                    "alunoServidor":"' . $employeeStatus . '"
                 }
             }]
             }
